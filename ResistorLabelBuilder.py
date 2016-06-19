@@ -3,55 +3,55 @@ from PIL import Image, ImageDraw, ImageFont
 ## Using Avery 8593 White File-Folder Labels
 
 ## Sheet dimensions
-SHEET_W = 8.5
-SHEET_H = 11
+SHEET_W = 8.3
+SHEET_H = 11.7
 
 ## Sheet margins
-UPPER_MARGIN = 0.472
-LOWER_MARGIN = 0.472
-LEFT_MARGIN = 0.512
-RIGHT_MARGIN = 0.512
+UPPER_MARGIN = 0.425
+LOWER_MARGIN = 0.425
+LEFT_MARGIN = 0.19
+RIGHT_MARGIN = 0.19
 
 ## Width of middle separator (between columns of labels)
-MIDDLE_DIV = 0.551
+MIDDLE_DIV = 0.1
 
 ## Label dimensions
-LABEL_W = 3.438
-LABEL_H = 0.666
+LABEL_W = 1.5
+LABEL_H = 0.83464
 
 ## Font size
-FONT = 18
+FONT = 12
 
 ## Text padding inside the labels
 PADDING = .2
 
 ## Number of labels to split each label into
-SUBLABELS = 2 ## TODO ADD WORKING SUBLABEL FUNCTIONALITY
+SUBLABELS = 1 ## TODO ADD WORKING SUBLABEL FUNCTIONALITY
 
 ## Number of rows in each label column
-ROWS = 15
+ROWS = 13
 
 ## Number of columns in each sheet
-COLUMNS = 2
+COLUMNS = 5
 
 ## Modifier for all scale values (should produce a higher resolution image)
 SCALE_MOD = 100
 
 ## Resistor values to generate labels for
-##RESISTORS = [1, 2.2, 4.7, 5.6, 7.5, 8.2, 10, 15, 22, 27,
-##             33, 39, 47, 56, 68, 75, 82, 100, 120, 150,
-##             180, 220, 270, 330, 390, 470, 510, 680, 820,
-##             1000, 1500, 2200, 3300, 3900, 4700, 5600,
-##             6800, 7500, 8200, 10000, 15000, 22000, 33000,
-##             39000, 47000, 56000, 68000, 75000, 82000,
-##             10000, 150000, 180000, 220000, 330000, 470000,
-##             560000, 680000, 1000000, 1500000, 2000000,
-##             3300000, 4700000, 5600000, 10000000]
-
-## My container only has 24 slots, so we're going to use the 24 smallest resistors.
 RESISTORS = [1, 2.2, 4.7, 5.6, 7.5, 8.2, 10, 15, 22, 27,
              33, 39, 47, 56, 68, 75, 82, 100, 120, 150,
-             180, 220, 270, 330]
+             180, 220, 270, 330, 390, 470, 510, 680, 820,
+             1000, 1500, 2200, 3300, 3900, 4700, 5600,
+             6800, 7500, 8200, 10000, 15000, 22000, 33000,
+             39000, 47000, 56000, 68000, 75000, 82000,
+             10000, 150000, 180000, 220000, 330000, 470000,
+             560000, 680000, 1000000, 1500000, 2000000,
+             3300000, 4700000, 5600000, 10000000]
+
+## My container only has 24 slots, so we're going to use the 24 smallest resistors.
+##RESISTORS = [1, 2.2, 4.7, 5.6, 7.5, 8.2, 10, 15, 22, 27,
+##             33, 39, 47, 56, 68, 75, 82, 100, 120, 150,
+##             180, 220, 270, 330]
 
 ## Resistor band colors (index in list cooresponds to digit)
 DIGIT = ["black", "brown", "red", "orange", "yellow", "green",
@@ -115,18 +115,14 @@ def create_resistor_bands( ohms ):
 def get_offset(column, row, sublabel, width, height):
 
     ## TODO: ADD BETTER SUPPORT FOR COLUMNS
-    if( column == 1 ):
-        leftOffset = (LEFT_MARGIN + LABEL_W/2)*SCALE_MOD
-    elif( column == 2 ):
-        leftOffset = (LEFT_MARGIN + LABEL_W + MIDDLE_DIV + LABEL_W / 2)*SCALE_MOD
-    else:
-        leftOffset = 0
-
+    leftOffset = (LEFT_MARGIN + LABEL_W + ((column -1.5)*(LABEL_W + MIDDLE_DIV)))* SCALE_MOD
+    leftOffset -= width/2
+    
     ## TODO: ADD BETTER SUPPORT FOR SUBLABELS
-    if( sublabel == 1 ):
-        leftOffset = leftOffset - (LABEL_W*SCALE_MOD)/4 - width/2
-    elif( sublabel == 2 ):
-        leftOffset = leftOffset + (LABEL_W*SCALE_MOD)/4 - width/2
+    ##if( sublabel == 1 ):
+    ##    leftOffset = leftOffset - (LABEL_W*SCALE_MOD)/4 - width/2
+    ##elif( sublabel == 2 ):
+    ##    leftOffset = leftOffset + (LABEL_W*SCALE_MOD)/4 - width/2
 
     upperOffset = UPPER_MARGIN*SCALE_MOD + LABEL_H*SCALE_MOD * (row - 1) + (LABEL_H*SCALE_MOD)/2
 
@@ -160,17 +156,17 @@ def create_image( filetype ):
     currRow = 1
 
     ## Draws gridlines -- useful for debugging
-##    draw.rectangle(((LEFT_MARGIN*SCALE_MOD, UPPER_MARGIN*SCALE_MOD),((SHEET_W-RIGHT_MARGIN)*SCALE_MOD,
-##                                                                     (SHEET_H-LOWER_MARGIN)*SCALE_MOD)),
-##                                                                      fill=None, outline="black")
-##    draw.rectangle((((LEFT_MARGIN+LABEL_W)*SCALE_MOD, UPPER_MARGIN*SCALE_MOD),
-##                    ((LEFT_MARGIN+LABEL_W+MIDDLE_DIV)*SCALE_MOD,(SHEET_H-LOWER_MARGIN)*SCALE_MOD)),
-##                   fill=None, outline="black")
-##    
-##    for i in range(ROWS):
-##        draw.rectangle(((LEFT_MARGIN*SCALE_MOD,UPPER_MARGIN*SCALE_MOD+LABEL_H*SCALE_MOD*i),
-##                        ((SHEET_W-RIGHT_MARGIN)*SCALE_MOD,SCALE_MOD+LABEL_H*SCALE_MOD*(i+LABEL_H*SCALE_MOD))),fill=None, outline="black")
-    ##
+    ##draw.rectangle(((LEFT_MARGIN*SCALE_MOD, UPPER_MARGIN*SCALE_MOD),((SHEET_W-RIGHT_MARGIN)*SCALE_MOD,
+                                                                 ##    (SHEET_H-LOWER_MARGIN)*SCALE_MOD)),
+                                                                 ##     fill=None, outline="black")
+    ##draw.rectangle((((LEFT_MARGIN+LABEL_W)*SCALE_MOD, UPPER_MARGIN*SCALE_MOD),
+    ##                ((LEFT_MARGIN+LABEL_W+MIDDLE_DIV)*SCALE_MOD,(SHEET_H-LOWER_MARGIN)*SCALE_MOD)),
+    ##               fill=None, outline="black")
+    
+    ##for i in range(ROWS):
+    ##    draw.rectangle(((LEFT_MARGIN*SCALE_MOD,UPPER_MARGIN*SCALE_MOD+LABEL_H*SCALE_MOD*i),
+    ##                    ((SHEET_W-RIGHT_MARGIN)*SCALE_MOD,SCALE_MOD+LABEL_H*SCALE_MOD*(i+LABEL_H*SCALE_MOD))),fill=None, outline="black")
+
     
     for i in RESISTORS:
         ohms = str(shorten_name(i))
